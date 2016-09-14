@@ -461,6 +461,7 @@ class Recognizer(AudioSource):
         m_hop_s = m_win_s // 4 # hop si
         p = aubio.pvoc(m_win_s, m_hop_s)
         m = aubio.mfcc(m_win_s, n_filters, n_coeffs, source.SAMPLE_RATE)
+        mfccs = np.zeros([n_coeffs,])
         
         # read audio input for phrases until there is a phrase that is long enough
         elapsed_time = 0 # number of seconds of audio read
@@ -489,7 +490,7 @@ class Recognizer(AudioSource):
                     # MFCC
                     spec = p(signal)
                     mfcc_out = m(spec)
-                    mfccs = vstack((mfccs, mfcc_out))
+                    mfccs = np.vstack((mfccs, mfcc_out))
                     print(mfccs)
                     
                     # Pitch
@@ -525,7 +526,7 @@ class Recognizer(AudioSource):
                     # MFCC
                     spec = p(signal)
                     mfcc_out = m(spec)
-                    mfccs = vstack((mfccs, mfcc_out))
+                    mfccs = np.vstack((mfccs, mfcc_out))
                     print(mfccs)
                     
                     # Pitch
