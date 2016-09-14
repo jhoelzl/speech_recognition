@@ -12,7 +12,7 @@ import platform, stat, random, uuid
 import json
 
 import numpy as np
-from aubio import pitch
+import aubio
 
 try: # attempt to use the Python 2 modules
     from urllib import urlencode
@@ -449,8 +449,8 @@ class Recognizer(AudioSource):
         tolerance = 0.8
         downsample = 1
         win_s = 4096 // downsample # fft size
-        hop_s = 240  // downsample # hop size
-        pitch_o = pitch("yin", win_s, hop_s, source.SAMPLE_RATE)
+        hop_s = 1024  // downsample # hop size
+        pitch_o = aubio.pitch("yin", win_s, hop_s, source.SAMPLE_RATE)
         pitch_o.set_unit("f0")
         pitch_o.set_tolerance(tolerance)
         
