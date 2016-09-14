@@ -476,12 +476,10 @@ class Recognizer(AudioSource):
                 if energy > self.energy_threshold: 
                     
                     # Pitch
-                    signal = np.fromstring(buffer, dtype=np.int16)
                     signal = signal.astype(np.float32)
-                    #print(signal.shape)
-                    #print(signal.shape)
-                    #print(type(signal))
                     pitch = pitch_o(signal)[0]
+                    confidence = pitch_o.get_confidence()
+                    print("Pitch: {} / Confidence: {}".format(pitch,confidence))
                     break
 
                 # dynamically adjust the energy threshold using assymmetric weighted average
@@ -504,6 +502,12 @@ class Recognizer(AudioSource):
                 energy = audioop.rms(buffer, source.SAMPLE_WIDTH) # energy of the audio signal
                 if energy > self.energy_threshold:
                     pause_count = 0
+                    
+                    # Pitch
+                    signal = signal.astype(np.float32)
+                    pitch = pitch_o(signal)[0]
+                    confidence = pitch_o.get_confidence()
+                    print("Pitch: {} / Confidence: {}".format(pitch,confidence))
                 else:
                     pause_count += 1
                 if pause_count > pause_buffer_count: # end of the phrase
