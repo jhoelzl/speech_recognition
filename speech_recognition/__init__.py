@@ -11,6 +11,9 @@ import math, audioop, collections, threading
 import platform, stat, random, uuid
 import json
 
+import numpy as np
+from aubio import pitch
+
 try: # attempt to use the Python 2 modules
     from urllib import urlencode
     from urllib2 import Request, urlopen, URLError, HTTPError
@@ -441,7 +444,16 @@ class Recognizer(AudioSource):
         pause_buffer_count = int(math.ceil(self.pause_threshold / seconds_per_buffer)) # number of buffers of non-speaking audio before the phrase is complete
         phrase_buffer_count = int(math.ceil(self.phrase_threshold / seconds_per_buffer)) # minimum number of buffers of speaking audio before we consider the speaking audio a phrase
         non_speaking_buffer_count = int(math.ceil(self.non_speaking_duration / seconds_per_buffer)) # maximum number of buffers of non-speaking audio to retain before and after
-
+        
+        # Pitch
+        tolerance = 0.8
+        downsample = 1
+        win_s = 4096 // downsample # fft size
+        hop_s = 240  // downsample # hop size
+        pitch_o = pitch("yin", win_s, hop_s, source.SAMPLE_RATE)
+        pitch_o.set_unit("f0")
+        pitch_o.set_tolerance(tolerance)
+        
         # read audio input for phrases until there is a phrase that is long enough
         elapsed_time = 0 # number of seconds of audio read
         while True:
@@ -461,7 +473,16 @@ class Recognizer(AudioSource):
 
                 # detect whether speaking has started on audio input
                 energy = audioop.rms(buffer, source.SAMPLE_WIDTH) # energy of the audio signal
-                if energy > self.energy_threshold: break
+                if energy > self.energy_threshold: 
+                    
+                    # Pitch
+                    signal = np.fromstring(buffer, dtype=np.int16)
+                    signal = signal.astype(np.float32)
+                    #print(signal.shape)
+                    #print(signal.shape)
+                    #print(type(signal))
+                    pitch = pitch_o(signal)[0]
+                    break
 
                 # dynamically adjust the energy threshold using assymmetric weighted average
                 if self.dynamic_energy_threshold:
