@@ -454,6 +454,14 @@ class Recognizer(AudioSource):
         pitch_o.set_unit("f0")
         pitch_o.set_tolerance(tolerance)
         
+        # MFCC
+        n_filters = 40  # must be 40 for mfcc
+        n_coeffs = 13
+        m_win_s = 512                 # fft size
+        m_hop_s = m_win_s // 4 # hop si
+        p = aubio.pvoc(m_win_s, m_hop_s)
+        m = aubio.mfcc(m_win_s, n_filters, n_coeffs, source.SAMPLE_RATE)
+        
         # read audio input for phrases until there is a phrase that is long enough
         elapsed_time = 0 # number of seconds of audio read
         while True:
@@ -475,8 +483,16 @@ class Recognizer(AudioSource):
                 energy = audioop.rms(buffer, source.SAMPLE_WIDTH) # energy of the audio signal
                 if energy > self.energy_threshold: 
                     
-                    # Pitch
+                    signal = np.fromstring(buffer, dtype=np.int16)
                     signal = signal.astype(np.float32)
+                    
+                    # MFCC
+                    spec = p(signal)
+                    mfcc_out = m(spec)
+                    mfccs = vstack((mfccs, mfcc_out))
+                    print(mfccs)
+                    
+                    # Pitch
                     pitch = pitch_o(signal)[0]
                     confidence = pitch_o.get_confidence()
                     print("Pitch: {} / Confidence: {}".format(pitch,confidence))
@@ -503,8 +519,16 @@ class Recognizer(AudioSource):
                 if energy > self.energy_threshold:
                     pause_count = 0
                     
-                    # Pitch
+                    signal = np.fromstring(buffer, dtype=np.int16)
                     signal = signal.astype(np.float32)
+                    
+                    # MFCC
+                    spec = p(signal)
+                    mfcc_out = m(spec)
+                    mfccs = vstack((mfccs, mfcc_out))
+                    print(mfccs)
+                    
+                    # Pitch
                     pitch = pitch_o(signal)[0]
                     confidence = pitch_o.get_confidence()
                     print("Pitch: {} / Confidence: {}".format(pitch,confidence))
