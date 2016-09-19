@@ -463,6 +463,10 @@ class Recognizer(AudioSource):
         m = aubio.mfcc(m_win_s, n_filters, n_coeffs, source.SAMPLE_RATE)
         mfccs = np.zeros([n_coeffs,])
         
+        # Zero Crossing Rate
+        zcr = aubio.zero_crossing_rate(signal)[0]
+        print("Zero-Crossing-Rate: {}".format(zcr))
+                
         # read audio input for phrases until there is a phrase that is long enough
         elapsed_time = 0 # number of seconds of audio read
         while True:
@@ -498,6 +502,10 @@ class Recognizer(AudioSource):
                     confidence = pitch_o.get_confidence()
                     print("Pitch: {} / Confidence: {}".format(pitch,confidence))
                     break
+                
+                    # Zero Crossing Rate
+                    zcr = aubio.zero_crossing_rate(signal)[0]
+                    print("Zero-Crossing-Rate: {}".format(zcr))
 
                 # dynamically adjust the energy threshold using assymmetric weighted average
                 if self.dynamic_energy_threshold:
