@@ -464,7 +464,7 @@ class Recognizer(AudioSource):
         mfccs = np.zeros([n_coeffs,])
         
         # Zero Crossing Rate
-        zcr = aubio.zero_crossing_rate(signal)[0]
+        zcr = aubio.zero_crossing_rate(signal)
         print("Zero-Crossing-Rate: {}".format(zcr))
                 
         # read audio input for phrases until there is a phrase that is long enough
@@ -504,7 +504,7 @@ class Recognizer(AudioSource):
                     break
                 
                     # Zero Crossing Rate
-                    zcr = aubio.zero_crossing_rate(signal)[0]
+                    zcr = aubio.zero_crossing_rate(signal)
                     print("Zero-Crossing-Rate: {}".format(zcr))
 
                 # dynamically adjust the energy threshold using assymmetric weighted average
